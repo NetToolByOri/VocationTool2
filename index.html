@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="version" content="3.05">
-  <title>315-休假作業管制工具 3.05</title>
+  <meta name="version" content="3.06">
+  <title>315-休假作業管制工具 3.06</title>
   <style>
     :root{color-scheme:dark;--bg:#090f17;--panel:#111b28;--panel2:#182536;--line:#31465e;--text:#f1f6fc;--muted:#9aacbf;--blue:#356fa9;--green:#277b61;--yellow:#8b7023;--red:#a33e4b;--purple:#7050a0;--shadow:0 15px 40px #0009}
     *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif}body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
@@ -20,7 +20,7 @@
 <body>
 <div class="app">
   <header class="top">
-    <div class="title-line"><h1>休假作業管制工具 <small>v3.05</small></h1><button id="systemBtn" class="settings-button" title="系統">⚙️</button></div>
+    <div class="title-line"><h1>休假作業管制工具 <small>v3.06</small></h1><button id="systemBtn" class="settings-button" title="系統">⚙️</button></div>
     <div class="date-line"><label for="reportDate">資料日期</label><input id="reportDate" type="date"><button id="addPerson" class="good">＋新增</button></div>
     <div class="view-tabs"><button id="timelineView" class="active">時序</button><button id="faceView">假面</button><button id="statusToggle" class="status-toggle">狀態：開</button></div>
   </header>
@@ -140,7 +140,7 @@ function selected(sel){return $(sel+' .selected')?.dataset.value||''}
 function selectOnly(box,b){box.querySelectorAll('button').forEach(x=>x.classList.toggle('selected',x===b))}
 function openLeave(id){editId=id;const p=person(id);if(!p)return;$('#editStart').value=p.startDate;$('#editEnd').value=p.endDate;choices('#startTools',TOOLS,p.startTool,'tool');choices('#endTools',TOOLS,p.endTool,'tool');choices('#startRoutes',ROUTES,p.startRoute,'route');choices('#endRoutes',ROUTES,p.endRoute,'route');$('#leaveDialog').showModal()}
 function markEdited(p){if(p.recordState!=='new')p.recordState='changed';if(p.faceState==='done')p.faceState='adjusted';touch(p)}
-function openAction(id){editId=id;const p=person(id);if(!p)return;$('#actionTitle').textContent=(p.name.trim()||'未填姓名')+'・作業選單';$('#finalizeAction').disabled=p.recordState==='final';$('#sentAddAction').disabled=p.recordState!=='new';$('#sentEditAction').disabled=p.recordState!=='changed';$('#confirmStartAction').disabled=!validDate(p.startDate);$('#confirmEndAction').disabled=!validDate(p.endDate);$('#routeReportAction').disabled=!needsRoute(p,'start')&&!needsRoute(p,'end');$('#faceDoneAction').textContent=p.faceState==='done'?'🎭 假面已完成（重新確認）':'🎭 假面完成';$('#actionDialog').showModal()}
+function openAction(id){editId=id;const p=person(id);if(!p)return;$('#actionTitle').textContent=(p.name.trim()||'未填姓名')+'・作業選單';$('#finalizeAction').disabled=false;$('#sentAddAction').disabled=false;$('#sentEditAction').disabled=false;$('#sentDeleteAction').disabled=false;$('#confirmStartAction').disabled=!validDate(p.startDate);$('#confirmEndAction').disabled=!validDate(p.endDate);$('#routeReportAction').disabled=!needsRoute(p,'start')&&!needsRoute(p,'end');$('#faceDoneAction').textContent=p.faceState==='done'?'🎭 假面已完成（重新確認）':'🎭 假面完成';$('#actionDialog').showModal()}
 function setRecord(status,msg){const p=person(editId);if(!p)return;p.recordState=status;touch(p);save();close('actionDialog');render();toast(msg)}
 function confirmTransport(side){const p=person(editId);if(!p)return;const target=p[side+'Date'],label=side==='start'?'休假':'收假';if(!validDate(target)){toast('請先填寫有效日期');return}if(!confirm(`確定${label}交通已確認建檔成功？`))return;p[side+'Confirm']={date:state.reportDate,lead:Math.max(0,diffDays(target,state.reportDate))};if(p.recordState!=='sent-delete')p.recordState='final';touch(p);save();close('actionDialog');render();toast(label+'交通已確認')}
 function reportRoute(side){const p=person(editId);if(!p||!needsRoute(p,side)){toast('這一端沒有特殊航線');return}p[side+'RouteReported']=true;touch(p);save();render();toast((side==='start'?'休假':'收假')+'特殊航線已申報成功');const other=side==='start'?'end':'start';if(!needsRoute(p,other)||p[other+'RouteReported'])close('routeDialog')}
